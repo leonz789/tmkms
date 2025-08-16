@@ -1,5 +1,7 @@
 //! Subcommands of the `tmkms` command-line application
 
+/// Feeder-signer subcommand for handling price feed signing requests
+pub mod feedersigner;
 pub mod init;
 #[cfg(feature = "ledger")]
 pub mod ledger;
@@ -50,6 +52,9 @@ pub enum KmsCommand {
     #[cfg(feature = "yubihsm")]
     #[clap(subcommand)]
     Yubihsm(YubihsmCommand),
+
+    /// feeder signing service
+    Feeder(feedersigner::FeederSignerCmd),
 }
 
 impl KmsCommand {
@@ -70,6 +75,7 @@ impl Configurable<KmsConfig> for KmsCommand {
     fn config_path(&self) -> Option<PathBuf> {
         let config = match self {
             KmsCommand::Start(start) => start.config.as_ref(),
+            KmsCommand::Feeder(feedersigner) => feedersigner.config.as_ref(),
             #[cfg(feature = "yubihsm")]
             KmsCommand::Yubihsm(yubihsm) => yubihsm.config_path(),
             #[cfg(feature = "ledger")]

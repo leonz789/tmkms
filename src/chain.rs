@@ -18,6 +18,9 @@ use crate::{
 use std::{path::PathBuf, sync::Mutex};
 pub use tendermint::chain::Id;
 
+pub use self::registry::ed25519_public_key_bytes;
+pub use self::registry::sign_raw_bytes;
+
 /// Information about a particular Tendermint blockchain network
 pub struct Chain {
     /// ID of a particular chain

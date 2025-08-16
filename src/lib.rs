@@ -28,6 +28,14 @@ pub mod privval;
 pub mod rpc;
 pub mod session;
 
+/// IMUA-specific modules and functionality
+pub mod imua {
+            /// Protocol Buffer definitions for Oracle Stream protocol
+        pub mod privval {
+        include!(concat!(env!("OUT_DIR"), "/privval.v1.rs"));
+    }
+}
+
 #[cfg(feature = "yubihsm")]
 pub mod yubihsm;
 

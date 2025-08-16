@@ -9,6 +9,7 @@ use crate::{
 };
 use once_cell::sync::Lazy;
 use std::sync::RwLock;
+use tendermint::TendermintKey;
 
 /// State of Tendermint blockchain networks
 pub static REGISTRY: Lazy<GlobalRegistry> = Lazy::new(GlobalRegistry::default);
@@ -95,5 +96,32 @@ impl GlobalRegistry {
         // TODO(tarcieri): better handle `PoisonError` here?
         let mut registry = self.0.write().unwrap();
         registry.register_chain(chain)
+    }
+}
+
+/// Sign raw bytes with the chain's default Ed25519 consensus key
+pub fn sign_raw_bytes(chain: &Chain, msg: &[u8]) -> Result<Vec<u8>, Error> {
+    let sig = chain.keyring.sign(None, msg)?;
+    Ok(sig.to_vec())
+}
+
+/// Get Ed25519 public key bytes from the chain's default consensus key
+pub fn ed25519_public_key_bytes(chain: &Chain) -> Result<Vec<u8>, Error> {
+    match chain.keyring.default_pubkey()? {
+        TendermintKey::ConsensusKey(pk) => {
+            let proto_pk: tendermint_proto::crypto::PublicKey = pk.into();
+            match proto_pk.sum {
+                Some(tendermint_proto::crypto::public_key::Sum::Ed25519(bytes)) => {
+                    Ok(bytes)
+                }
+                other => fail!(InvalidKey, "unexpected consensus key variant: {:?}", other),
+            }
+        }
+        TendermintKey::AccountKey(_) => {
+            fail!(
+                InvalidKey,
+                "default key is ECDSA(AccountKey), expected Ed25519(consensusKey)"
+            );
+        }
     }
 }

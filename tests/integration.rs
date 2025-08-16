@@ -654,7 +654,7 @@ fn send_buffer_underflow_request(pt: &mut ProtocolTester) {
 /// Read the response as a Protobuf message
 fn read_response(pt: &mut ProtocolTester) -> proto::privval::message::Sum {
     let mut resp_buf = vec![0u8; 4096];
-    pt.read(&mut resp_buf).unwrap();
+    pt.read_exact(&mut resp_buf).unwrap();
 
     let actual_len = extract_actual_len(&resp_buf).unwrap();
     let mut resp_bytes = vec![0u8; actual_len as usize];

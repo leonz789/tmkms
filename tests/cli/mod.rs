@@ -37,8 +37,8 @@ where
     if status_code == 0 {
         output
     } else {
-        io::stdout().write(&output.stdout).unwrap();
-        io::stderr().write(&output.stderr).unwrap();
+        io::stdout().write_all(&output.stdout).unwrap();
+        io::stderr().write_all(&output.stderr).unwrap();
 
         panic!("{KMS_EXE_PATH} exited with error status: {status_code}");
     }
